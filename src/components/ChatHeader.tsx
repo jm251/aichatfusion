@@ -21,9 +21,13 @@ export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHead
   });
 
   useEffect(() => {
-    const updateServices = () => {
-      const services = AIService.getConfiguredServices();
-      setConfiguredServices(services);
+    const updateServices = async () => {
+      try {
+        const services = await AIService.getConfiguredServices();
+        setConfiguredServices(services);
+      } catch (error) {
+        console.error('Failed to get configured services:', error);
+      }
     };
     
     updateServices();

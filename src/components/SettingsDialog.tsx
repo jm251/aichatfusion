@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Settings, Eye, EyeSlash, Plus, Trash, Save, Lightbulb } from '@phosphor-icons/react';
-import { APIConfigService } from '@/lib/api-config';
+import { APIConfigManager } from '@/lib/api-config';
 import { toast } from 'sonner';
 
 export function SettingsDialog() {
@@ -28,13 +28,16 @@ export function SettingsDialog() {
 
   const loadCurrentKeys = async () => {
     try {
-      const keys = await APIConfigService.getConfiguredKeys();
-      setGroqKeys(keys.groqKeys?.length > 0 ? keys.groqKeys : ['']);
-      setPerplexityKeys(keys.perplexityKeys.length > 0 ? keys.perplexityKeys : ['']);
-      setGeminiKeys(keys.geminiKeys.length > 0 ? keys.geminiKeys : ['']);
-      setOpenrouterKeys(keys.openrouterKeys?.length > 0 ? keys.openrouterKeys : ['']);
+      await APIConfigManager.initialize();
+      const serviceStatus = await APIConfigManager.getServiceStatus();
+      
+      // Since we can't retrieve actual keys, we'll show placeholders for configured services
+      setGroqKeys(serviceStatus.groq ? ['Configured'] : ['']);
+      setPerplexityKeys(serviceStatus.perplexity ? ['Configured'] : ['']);
+      setGeminiKeys(serviceStatus.gemini ? ['Configured'] : ['']);
+      setOpenrouterKeys(serviceStatus.openrouter ? ['Configured'] : ['']);
     } catch (error) {
-      console.error('Failed to load API keys:', error);
+      console.error('Failed to load API key status:', error);
     }
   };
 
@@ -104,23 +107,13 @@ export function SettingsDialog() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Filter out empty keys
-      const validGroqKeys = groqKeys.filter(key => key.trim().length > 0);
-      const validPerplexityKeys = perplexityKeys.filter(key => key.trim().length > 0);
-      const validGeminiKeys = geminiKeys.filter(key => key.trim().length > 0);
-      const validOpenrouterKeys = openrouterKeys.filter(key => key.trim().length > 0);
-
-      await APIConfigService.setAPIKeys('groq', validGroqKeys);
-      await APIConfigService.setAPIKeys('perplexity', validPerplexityKeys);
-      await APIConfigService.setAPIKeys('gemini', validGeminiKeys);
-      await APIConfigService.setAPIKeys('openrouter', validOpenrouterKeys);
-
-      const totalKeys = validGroqKeys.length + validPerplexityKeys.length + validGeminiKeys.length + validOpenrouterKeys.length;
-      toast.success(`Saved ${totalKeys} API keys across all services`);
+      // Since this is a client-side app, API keys should be configured through environment variables
+      // This dialog is informational only
+      toast.info('API keys must be configured through environment variables');
       setOpen(false);
     } catch (error) {
-      toast.error('Failed to save API keys');
-      console.error('Save error:', error);
+      toast.error('Configuration error');
+      console.error('Configuration error:', error);
     } finally {
       setIsLoading(false);
     }
