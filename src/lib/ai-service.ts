@@ -1,5 +1,5 @@
 import { AIResponse, ResponseAnalysis } from './types';
-import { APIConfigService } from './api-config';
+import { APIKeyManager } from './api-config';
 
 export class AIService {
   
@@ -9,7 +9,7 @@ export class AIService {
     let keyUsed: string | null = null;
 
     try {
-      keyUsed = await APIConfigService.getNextKey('groq');
+      keyUsed = await APIKeyManager.getNextGroqKey();
       
       if (!keyUsed) {
         return {
@@ -54,7 +54,7 @@ export class AIService {
       if (!response.ok) {
         const errorData = await response.text();
         if (response.status === 429 || response.status === 402) {
-          await APIConfigService.markKeyAsFailed('groq', keyUsed);
+          await APIKeyManager.markKeyAsFailed('groq', keyUsed);
         }
         throw new Error(`Groq API error: ${response.status} - ${errorData}`);
       }
@@ -76,7 +76,7 @@ export class AIService {
 
     } catch (error) {
       if (keyUsed) {
-        await APIConfigService.markKeyAsFailed('groq', keyUsed);
+        await APIKeyManager.markKeyAsFailed('groq', keyUsed);
       }
       
       return {
@@ -94,7 +94,7 @@ export class AIService {
     let keyUsed: string | null = null;
 
     try {
-      keyUsed = await APIConfigService.getNextKey('gemini');
+      keyUsed = await APIKeyManager.getNextGeminiKey();
       
       if (!keyUsed) {
         return {
@@ -129,7 +129,7 @@ export class AIService {
       if (!response.ok) {
         const errorData = await response.text();
         if (response.status === 429 || response.status === 403) {
-          await APIConfigService.markKeyAsFailed('gemini', keyUsed);
+          await APIKeyManager.markKeyAsFailed('gemini', keyUsed);
         }
         throw new Error(`Gemini API error: ${response.status} - ${errorData}`);
       }
@@ -153,7 +153,7 @@ export class AIService {
 
     } catch (error) {
       if (keyUsed) {
-        await APIConfigService.markKeyAsFailed('gemini', keyUsed);
+        await APIKeyManager.markKeyAsFailed('gemini', keyUsed);
       }
       
       return {
@@ -171,7 +171,7 @@ export class AIService {
     let keyUsed: string | null = null;
 
     try {
-      keyUsed = await APIConfigService.getNextKey('perplexity');
+      keyUsed = await APIKeyManager.getNextPerplexityKey();
       
       if (!keyUsed) {
         return {
@@ -210,7 +210,7 @@ export class AIService {
       if (!response.ok) {
         const errorData = await response.text();
         if (response.status === 429 || response.status === 402) {
-          await APIConfigService.markKeyAsFailed('perplexity', keyUsed);
+          await APIKeyManager.markKeyAsFailed('perplexity', keyUsed);
         }
         throw new Error(`Perplexity API error: ${response.status} - ${errorData}`);
       }
@@ -232,7 +232,7 @@ export class AIService {
 
     } catch (error) {
       if (keyUsed) {
-        await APIConfigService.markKeyAsFailed('perplexity', keyUsed);
+        await APIKeyManager.markKeyAsFailed('perplexity', keyUsed);
       }
       
       return {
@@ -250,7 +250,7 @@ export class AIService {
     let keyUsed: string | null = null;
 
     try {
-      keyUsed = await APIConfigService.getNextKey('openrouter');
+      keyUsed = await APIKeyManager.getNextOpenrouterKey();
       
       if (!keyUsed) {
         return {
@@ -291,7 +291,7 @@ export class AIService {
       if (!response.ok) {
         const errorData = await response.text();
         if (response.status === 429 || response.status === 402) {
-          await APIConfigService.markKeyAsFailed('openrouter', keyUsed);
+          await APIKeyManager.markKeyAsFailed('openrouter', keyUsed);
         }
         throw new Error(`OpenRouter API error: ${response.status} - ${errorData}`);
       }
@@ -313,7 +313,7 @@ export class AIService {
 
     } catch (error) {
       if (keyUsed) {
-        await APIConfigService.markKeyAsFailed('openrouter', keyUsed);
+        await APIKeyManager.markKeyAsFailed('openrouter', keyUsed);
       }
       
       return {
@@ -353,7 +353,7 @@ export class AIService {
 
   // Fast Sequential Fallback Strategy
   private static async getSequentialResponse(message: string): Promise<AIResponse> {
-    const availableServices = APIConfigService.getAvailableServices();
+    const availableServices = APIKeyManager.getAvailableServices();
     
     // Try Groq first for speed
     if (availableServices.groq) {
@@ -385,7 +385,7 @@ export class AIService {
 
   // Parallel Multi-Response Strategy
   private static async getParallelResponses(message: string): Promise<AIResponse[]> {
-    const availableServices = APIConfigService.getAvailableServices();
+    const availableServices = APIKeyManager.getAvailableServices();
     const promises: Promise<AIResponse>[] = [];
     
     // Add available services to parallel execution
@@ -542,7 +542,7 @@ ${responseTexts}`;
     openrouter: boolean;
     sparkLLM: boolean;
   } {
-    const available = APIConfigService.getAvailableServices();
+    const available = APIKeyManager.getAvailableServices();
     return {
       groq: available.groq,
       gemini: available.gemini,
