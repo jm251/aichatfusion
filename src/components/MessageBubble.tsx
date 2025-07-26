@@ -27,11 +27,17 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
       return 'bg-user-message text-user-message-foreground ml-12';
     }
     
-    if (message.source === 'secondary') {
-      return 'bg-ai-secondary text-ai-secondary-foreground mr-12';
+    // Different colors for different AI services
+    switch (message.source) {
+      case 'perplexity':
+        return 'bg-ai-primary text-ai-primary-foreground mr-12';
+      case 'gemini':
+        return 'bg-ai-secondary text-ai-secondary-foreground mr-12';
+      case 'spark-llm':
+        return 'bg-accent text-accent-foreground mr-12';
+      default:
+        return 'bg-ai-primary text-ai-primary-foreground mr-12';
     }
-    
-    return 'bg-ai-primary text-ai-primary-foreground mr-12';
   };
 
   const getIcon = () => {
@@ -42,12 +48,27 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
   const getSourceBadge = () => {
     if (isUser || !message.source) return null;
     
+    const getServiceInfo = (source: string) => {
+      switch (source) {
+        case 'perplexity':
+          return { name: 'Perplexity AI', variant: 'default' as const };
+        case 'gemini':
+          return { name: 'Google Gemini', variant: 'secondary' as const };
+        case 'spark-llm':
+          return { name: 'Spark LLM', variant: 'outline' as const };
+        default:
+          return { name: source, variant: 'default' as const };
+      }
+    };
+    
+    const serviceInfo = getServiceInfo(message.source);
+    
     return (
       <Badge 
-        variant={message.source === 'primary' ? 'default' : 'secondary'}
+        variant={serviceInfo.variant}
         className="text-xs"
       >
-        {message.source === 'primary' ? 'Primary AI' : 'Secondary AI'}
+        {serviceInfo.name}
       </Badge>
     );
   };

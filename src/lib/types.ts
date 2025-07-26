@@ -1,9 +1,11 @@
+export type AIService = 'perplexity' | 'gemini' | 'spark-llm';
+
 export interface Message {
   id: string;
   content: string;
   role: 'user' | 'assistant';
   timestamp: number;
-  source?: 'primary' | 'secondary';
+  source?: AIService;
   isLoading?: boolean;
   error?: string;
 }
@@ -16,7 +18,8 @@ export interface ChatState {
 
 export interface AIResponse {
   content: string;
-  source: 'primary' | 'secondary';
+  source: AIService;
   success: boolean;
   error?: string;
+  keyUsed?: string; // Track which API key was used
 }
