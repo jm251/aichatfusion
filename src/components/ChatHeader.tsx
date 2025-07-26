@@ -47,53 +47,51 @@ export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHead
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border-b bg-card">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Robot className="w-6 h-6 text-primary" weight="fill" />
-          <h1 className="text-xl font-bold">AI Chat Assistant</h1>
+    <div className="flex items-center justify-between p-6 border-b bg-white/80 backdrop-blur-lg shadow-sm">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+            <Robot className="w-6 h-6 text-white" weight="fill" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">AI Chat Assistant</h1>
+            <p className="text-xs text-muted-foreground">Powered by multiple AI services</p>
+          </div>
         </div>
         {messageCount > 0 && (
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="px-3 py-1 text-xs font-medium">
             {messageCount} messages
           </Badge>
         )}
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         {isLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             <span>AI thinking...</span>
           </div>
         )}
         
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Lightbulb className="w-3 h-3" />
-            <span>{getServiceStatus()}</span>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            {configuredServices.perplexity && (
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
-                <CheckCircle className="w-2 h-2" />
-                Perplexity
-              </Badge>
-            )}
-            {configuredServices.gemini && (
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
-                <CheckCircle className="w-2 h-2" />
-                Gemini
-              </Badge>
-            )}
-            {configuredServices.sparkLLM && (
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
-                <CheckCircle className="w-2 h-2" />
-                Spark
-              </Badge>
-            )}
-          </div>
+        <div className="hidden md:flex items-center gap-2">
+          {configuredServices.perplexity && (
+            <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" weight="fill" />
+              Perplexity AI
+            </div>
+          )}
+          {configuredServices.gemini && (
+            <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" weight="fill" />
+              Google Gemini
+            </div>
+          )}
+          {configuredServices.sparkLLM && (
+            <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" weight="fill" />
+              Spark LLM
+            </div>
+          )}
         </div>
         
         <SettingsDialog />
@@ -103,10 +101,11 @@ export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHead
             variant="ghost"
             size="sm"
             onClick={onClearHistory}
-            className="text-muted-foreground hover:text-destructive"
+            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             disabled={isLoading}
           >
             <Trash className="w-4 h-4" />
+            <span className="hidden sm:inline ml-2">Clear</span>
           </Button>
         )}
       </div>

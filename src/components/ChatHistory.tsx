@@ -34,11 +34,18 @@ export function ChatHistory({ messages }: ChatHistoryProps) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center text-muted-foreground max-w-md">
-          <div className="text-6xl mb-4">💬</div>
-          <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
-          <p className="text-sm">
-            Ask me anything! I'll provide thoughtful responses and show you different perspectives when possible.
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center">
+            <div className="text-4xl">🤖</div>
+          </div>
+          <h3 className="text-xl font-semibold mb-3 text-foreground">Welcome to AI Chat Assistant</h3>
+          <p className="text-sm leading-relaxed mb-4">
+            Ask me anything! I'll provide thoughtful responses from multiple AI services including Perplexity AI and Google Gemini to give you comprehensive perspectives.
           </p>
+          <div className="flex flex-wrap justify-center gap-2 text-xs">
+            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Perplexity AI</span>
+            <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">Google Gemini</span>
+            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Spark LLM</span>
+          </div>
         </div>
       </div>
     );
@@ -86,42 +93,45 @@ export function ChatHistory({ messages }: ChatHistoryProps) {
     }
   }
 
-  return (
-    <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-      <div className="space-y-6">
-        {groupedMessages.map((item, index) => {
-          if (Array.isArray(item)) {
-            // Multiple AI responses - show comparison view
-            return (
-              <div key={`group-${index}`} className="space-y-4">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Separator className="flex-1" />
-                  <span>Multiple AI Responses</span>
-                  <Separator className="flex-1" />
+    return (
+      <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
+        <div className="space-y-8 max-w-4xl mx-auto">
+          {groupedMessages.map((item, index) => {
+            if (Array.isArray(item)) {
+              // Multiple AI responses - show comparison view
+              return (
+                <div key={`group-${index}`} className="space-y-4">
+                  <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
+                    <Separator className="flex-1" />
+                    <div className="flex items-center gap-2 bg-muted/50 px-3 py-1 rounded-full">
+                      <span>✨ Multiple AI Perspectives</span>
+                    </div>
+                    <Separator className="flex-1" />
+                  </div>
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    {item.map((message) => (
+                      <div key={message.id} className="space-y-2">
+                        <MessageBubble
+                          message={message}
+                          onCopy={handleCopyMessage}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {item.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      onCopy={handleCopyMessage}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          } else {
-            // Single message
-            return (
-              <MessageBubble
-                key={item.id}
-                message={item}
-                onCopy={handleCopyMessage}
-              />
-            );
-          }
-        })}
-      </div>
-    </ScrollArea>
-  );
+              );
+            } else {
+              // Single message
+              return (
+                <MessageBubble
+                  key={item.id}
+                  message={item}
+                  onCopy={handleCopyMessage}
+                />
+              );
+            }
+          })}
+        </div>
+      </ScrollArea>
+    );
 }

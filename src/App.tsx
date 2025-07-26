@@ -78,7 +78,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex flex-col">
       <ChatHeader 
         messageCount={messages.length}
         onClearHistory={handleClearHistory}
