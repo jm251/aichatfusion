@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { User, Robot, Copy, Clock, CheckCircle } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface MessageBubbleProps {
   message: Message;
@@ -48,6 +49,19 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
         return 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg border-purple-200';
       default:
         return 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-800 shadow-lg border-slate-200';
+    }
+  };
+
+  const isDarkTheme = () => {
+    if (isUser) return true;
+    
+    switch (message.source) {
+      case 'perplexity':
+      case 'gemini':
+      case 'spark-llm':
+        return true;
+      default:
+        return false;
     }
   };
 
@@ -145,8 +159,12 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
                 <div className="text-xs opacity-80 mt-2 bg-black/10 rounded p-2">{message.error}</div>
               </div>
             ) : (
-              <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                {message.content}
+              <div className="text-sm leading-relaxed">
+                <MarkdownRenderer 
+                  content={message.content}
+                  isDark={isDarkTheme()}
+                  className="prose-invert:prose-dark"
+                />
               </div>
             )}
           </Card>
@@ -157,9 +175,12 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
               size="sm"
               variant="ghost"
               className={cn(
-                "absolute -top-2 -right-2 opacity-0 group-hover/message:opacity-100 transition-all duration-200",
-                "bg-white/90 hover:bg-white shadow-md border h-8 w-8 p-0 rounded-full",
-                isCopied && "bg-green-50 border-green-200"
+                "absolute -top-2 -right-2 transition-all duration-200",
+                "bg-white/95 hover:bg-white shadow-md border h-8 w-8 p-0 rounded-full",
+                "opacity-0 group-hover/message:opacity-100",
+                "md:opacity-0 md:group-hover/message:opacity-100", // Hidden on mobile unless hovered
+                "sm:opacity-60", // Always visible on mobile for better accessibility
+                isCopied && "bg-green-50 border-green-200 opacity-100"
               )}
               title={isCopied ? "Copied!" : "Copy message"}
             >
