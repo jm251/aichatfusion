@@ -1,10 +1,11 @@
 import { useState, KeyboardEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PaperPlaneTilt, Prohibit, Sparkle } from '@phosphor-icons/react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PaperPlaneTilt, Prohibit, Sparkle, Lightning, Stack } from '@phosphor-icons/react';
 
 interface MessageInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, strategy?: 'fast' | 'comprehensive') => void;
   disabled?: boolean;
   placeholder?: string;
 }
@@ -15,11 +16,12 @@ export function MessageInput({
   placeholder = "Type your message..." 
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
+  const [strategy, setStrategy] = useState<'fast' | 'comprehensive'>('comprehensive');
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
     if (trimmedMessage && !disabled) {
-      onSendMessage(trimmedMessage);
+      onSendMessage(trimmedMessage, strategy);
       setMessage('');
     }
   };
@@ -52,6 +54,27 @@ export function MessageInput({
               </div>
             )}
           </div>
+          
+          <Select value={strategy} onValueChange={(value: 'fast' | 'comprehensive') => setStrategy(value)}>
+            <SelectTrigger className="w-40 h-12 rounded-xl border-2">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="fast">
+                <div className="flex items-center gap-2">
+                  <Lightning className="w-4 h-4 text-orange-500" weight="fill" />
+                  <span>Fast Mode</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="comprehensive">
+                <div className="flex items-center gap-2">
+                  <Stack className="w-4 h-4 text-blue-500" weight="fill" />
+                  <span>Multi-AI</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          
           <Button
             onClick={handleSend}
             disabled={disabled || !message.trim()}
@@ -70,7 +93,7 @@ export function MessageInput({
         </div>
         <div className="mt-3 text-center">
           <p className="text-xs text-muted-foreground">
-            Press Enter to send • AI responses from multiple services
+            Press Enter to send • {strategy === 'fast' ? 'Fast sequential fallback' : 'Multiple AI perspectives'} • Enhanced syntax highlighting
           </p>
         </div>
       </div>

@@ -13,8 +13,10 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHeaderProps) {
   const [configuredServices, setConfiguredServices] = useState({
+    groq: false,
     perplexity: false,
     gemini: false,
+    openrouter: false,
     sparkLLM: true
   });
 
@@ -39,8 +41,10 @@ export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHead
 
   const getServiceStatus = () => {
     const services = [];
+    if (configuredServices.groq) services.push('Groq');
     if (configuredServices.perplexity) services.push('Perplexity');
     if (configuredServices.gemini) services.push('Gemini');
+    if (configuredServices.openrouter) services.push('OpenRouter');
     if (configuredServices.sparkLLM) services.push('Spark LLM');
     
     return services.length > 0 ? services.join(' + ') : 'No services configured';
@@ -74,22 +78,34 @@ export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHead
         )}
         
         <div className="hidden md:flex items-center gap-2">
+          {configuredServices.groq && (
+            <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" weight="fill" />
+              Groq ⚡
+            </div>
+          )}
           {configuredServices.perplexity && (
             <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
               <CheckCircle className="w-3 h-3" weight="fill" />
-              Perplexity AI
+              Perplexity 🌐
             </div>
           )}
           {configuredServices.gemini && (
             <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
               <CheckCircle className="w-3 h-3" weight="fill" />
-              Google Gemini
+              Gemini 🧐
+            </div>
+          )}
+          {configuredServices.openrouter && (
+            <div className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" weight="fill" />
+              OpenRouter 🎯
             </div>
           )}
           {configuredServices.sparkLLM && (
             <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
               <CheckCircle className="w-3 h-3" weight="fill" />
-              Spark LLM
+              Spark LLM 🔄
             </div>
           )}
         </div>

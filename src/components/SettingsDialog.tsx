@@ -6,14 +6,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Eye, EyeSlash, Plus, Trash, Save } from '@phosphor-icons/react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Settings, Eye, EyeSlash, Plus, Trash, Save, Lightbulb } from '@phosphor-icons/react';
 import { APIConfigService } from '@/lib/api-config';
 import { toast } from 'sonner';
 
 export function SettingsDialog() {
   const [open, setOpen] = useState(false);
+  const [groqKeys, setGroqKeys] = useState<string[]>(['']);
   const [perplexityKeys, setPerplexityKeys] = useState<string[]>(['']);
   const [geminiKeys, setGeminiKeys] = useState<string[]>(['']);
+  const [openrouterKeys, setOpenrouterKeys] = useState<string[]>(['']);
   const [showKeys, setShowKeys] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,40 +29,75 @@ export function SettingsDialog() {
   const loadCurrentKeys = async () => {
     try {
       const keys = await APIConfigService.getConfiguredKeys();
+      setGroqKeys(keys.groqKeys?.length > 0 ? keys.groqKeys : ['']);
       setPerplexityKeys(keys.perplexityKeys.length > 0 ? keys.perplexityKeys : ['']);
       setGeminiKeys(keys.geminiKeys.length > 0 ? keys.geminiKeys : ['']);
+      setOpenrouterKeys(keys.openrouterKeys?.length > 0 ? keys.openrouterKeys : ['']);
     } catch (error) {
       console.error('Failed to load API keys:', error);
     }
   };
 
-  const addKeyField = (service: 'perplexity' | 'gemini') => {
-    if (service === 'perplexity') {
-      setPerplexityKeys([...perplexityKeys, '']);
-    } else {
-      setGeminiKeys([...geminiKeys, '']);
+  const addKeyField = (service: 'groq' | 'perplexity' | 'gemini' | 'openrouter') => {
+    switch (service) {
+      case 'groq':
+        setGroqKeys([...groqKeys, '']);
+        break;
+      case 'perplexity':
+        setPerplexityKeys([...perplexityKeys, '']);
+        break;
+      case 'gemini':
+        setGeminiKeys([...geminiKeys, '']);
+        break;
+      case 'openrouter':
+        setOpenrouterKeys([...openrouterKeys, '']);
+        break;
     }
   };
 
-  const removeKeyField = (service: 'perplexity' | 'gemini', index: number) => {
-    if (service === 'perplexity') {
-      const newKeys = perplexityKeys.filter((_, i) => i !== index);
-      setPerplexityKeys(newKeys.length > 0 ? newKeys : ['']);
-    } else {
-      const newKeys = geminiKeys.filter((_, i) => i !== index);
-      setGeminiKeys(newKeys.length > 0 ? newKeys : ['']);
+  const removeKeyField = (service: 'groq' | 'perplexity' | 'gemini' | 'openrouter', index: number) => {
+    switch (service) {
+      case 'groq':
+        const newGroqKeys = groqKeys.filter((_, i) => i !== index);
+        setGroqKeys(newGroqKeys.length > 0 ? newGroqKeys : ['']);
+        break;
+      case 'perplexity':
+        const newPKeys = perplexityKeys.filter((_, i) => i !== index);
+        setPerplexityKeys(newPKeys.length > 0 ? newPKeys : ['']);
+        break;
+      case 'gemini':
+        const newGKeys = geminiKeys.filter((_, i) => i !== index);
+        setGeminiKeys(newGKeys.length > 0 ? newGKeys : ['']);
+        break;
+      case 'openrouter':
+        const newORKeys = openrouterKeys.filter((_, i) => i !== index);
+        setOpenrouterKeys(newORKeys.length > 0 ? newORKeys : ['']);
+        break;
     }
   };
 
-  const updateKey = (service: 'perplexity' | 'gemini', index: number, value: string) => {
-    if (service === 'perplexity') {
-      const newKeys = [...perplexityKeys];
-      newKeys[index] = value;
-      setPerplexityKeys(newKeys);
-    } else {
-      const newKeys = [...geminiKeys];
-      newKeys[index] = value;
-      setGeminiKeys(newKeys);
+  const updateKey = (service: 'groq' | 'perplexity' | 'gemini' | 'openrouter', index: number, value: string) => {
+    switch (service) {
+      case 'groq':
+        const newGroqKeys = [...groqKeys];
+        newGroqKeys[index] = value;
+        setGroqKeys(newGroqKeys);
+        break;
+      case 'perplexity':
+        const newPKeys = [...perplexityKeys];
+        newPKeys[index] = value;
+        setPerplexityKeys(newPKeys);
+        break;
+      case 'gemini':
+        const newGKeys = [...geminiKeys];
+        newGKeys[index] = value;
+        setGeminiKeys(newGKeys);
+        break;
+      case 'openrouter':
+        const newORKeys = [...openrouterKeys];
+        newORKeys[index] = value;
+        setOpenrouterKeys(newORKeys);
+        break;
     }
   };
 
@@ -67,13 +105,18 @@ export function SettingsDialog() {
     setIsLoading(true);
     try {
       // Filter out empty keys
+      const validGroqKeys = groqKeys.filter(key => key.trim().length > 0);
       const validPerplexityKeys = perplexityKeys.filter(key => key.trim().length > 0);
       const validGeminiKeys = geminiKeys.filter(key => key.trim().length > 0);
+      const validOpenrouterKeys = openrouterKeys.filter(key => key.trim().length > 0);
 
+      await APIConfigService.setAPIKeys('groq', validGroqKeys);
       await APIConfigService.setAPIKeys('perplexity', validPerplexityKeys);
       await APIConfigService.setAPIKeys('gemini', validGeminiKeys);
+      await APIConfigService.setAPIKeys('openrouter', validOpenrouterKeys);
 
-      toast.success(`Saved ${validPerplexityKeys.length} Perplexity and ${validGeminiKeys.length} Gemini keys`);
+      const totalKeys = validGroqKeys.length + validPerplexityKeys.length + validGeminiKeys.length + validOpenrouterKeys.length;
+      toast.success(`Saved ${totalKeys} API keys across all services`);
       setOpen(false);
     } catch (error) {
       toast.error('Failed to save API keys');
@@ -83,24 +126,21 @@ export function SettingsDialog() {
     }
   };
 
-  const maskKey = (key: string) => {
-    if (!showKeys && key.length > 8) {
-      return key.slice(0, 4) + '•'.repeat(key.length - 8) + key.slice(-4);
-    }
-    return key;
-  };
-
   const renderKeyInputs = (
     title: string,
     description: string,
     keys: string[],
-    service: 'perplexity' | 'gemini',
-    placeholder: string
+    service: 'groq' | 'perplexity' | 'gemini' | 'openrouter',
+    placeholder: string,
+    color: string
   ) => (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          {title}
+          <span className="flex items-center gap-2">
+            {title}
+            <div className={`w-3 h-3 rounded-full ${color}`} />
+          </span>
           <Badge variant="outline">
             {keys.filter(k => k.trim()).length} keys
           </Badge>
@@ -154,51 +194,150 @@ export function SettingsDialog() {
           Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>API Key Configuration</DialogTitle>
+          <DialogTitle>Multi-AI Configuration</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowKeys(!showKeys)}
-              className="gap-2"
-            >
-              {showKeys ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              {showKeys ? 'Hide' : 'Show'} Keys
-            </Button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowKeys(!showKeys)}
+                className="gap-2"
+              >
+                {showKeys ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showKeys ? 'Hide' : 'Show'} Keys
+              </Button>
+            </div>
+            
+            <Card className="p-3 bg-blue-50 border-blue-200">
+              <div className="flex items-start gap-2">
+                <Lightbulb className="w-4 h-4 text-blue-600 mt-0.5" weight="fill" />
+                <div className="text-xs text-blue-700">
+                  <div className="font-medium">Smart Strategy:</div>
+                  <div>Groq → Gemini → OpenRouter → Spark (fallback)</div>
+                </div>
+              </div>
+            </Card>
           </div>
 
-          {renderKeyInputs(
-            'Perplexity AI Keys',
-            'Add your Perplexity API keys for web-enhanced responses',
-            perplexityKeys,
-            'perplexity',
-            'pplx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-          )}
+          <Tabs defaultValue="groq" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="groq" className="text-xs">Groq ⚡</TabsTrigger>
+              <TabsTrigger value="perplexity" className="text-xs">Perplexity 🌐</TabsTrigger>
+              <TabsTrigger value="gemini" className="text-xs">Gemini 🧐</TabsTrigger>
+              <TabsTrigger value="openrouter" className="text-xs">OpenRouter 🎯</TabsTrigger>
+            </TabsList>
 
-          {renderKeyInputs(
-            'Google Gemini Keys',
-            'Add your Google Gemini API keys for advanced reasoning',
-            geminiKeys,
-            'gemini',
-            'AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-          )}
+            <TabsContent value="groq" className="space-y-4">
+              {renderKeyInputs(
+                'Groq ⚡ Speed & Real-Time',
+                'Ultra-fast responses for interactive chatbots (tries first for speed)',
+                groqKeys,
+                'groq',
+                'gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'bg-orange-500'
+              )}
+              <Card className="bg-orange-50 border-orange-200">
+                <CardContent className="p-4 text-sm text-orange-800">
+                  <div className="font-medium mb-1">Perfect for:</div>
+                  <div>• Real-time conversations • Quick responses • Interactive elements</div>
+                  <div className="text-xs mt-2 opacity-80">
+                    Get your key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="underline">console.groq.com/keys</a>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="perplexity" className="space-y-4">
+              {renderKeyInputs(
+                'Perplexity 🌐 Up-to-Date & Factual',
+                'Web-enhanced responses with current information and sourcing',
+                perplexityKeys,
+                'perplexity',
+                'pplx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'bg-blue-500'
+              )}
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4 text-sm text-blue-800">
+                  <div className="font-medium mb-1">Perfect for:</div>
+                  <div>• Current events • Research questions • Fact-checking • News updates</div>
+                  <div className="text-xs mt-2 opacity-80">
+                    Get your key: <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer" className="underline">perplexity.ai/settings/api</a>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="gemini" className="space-y-4">
+              {renderKeyInputs(
+                'Gemini 🧐 Complex Reasoning',
+                'Advanced reasoning for creative writing and complex instructions',
+                geminiKeys,
+                'gemini',
+                'AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'bg-emerald-500'
+              )}
+              <Card className="bg-emerald-50 border-emerald-200">
+                <CardContent className="p-4 text-sm text-emerald-800">
+                  <div className="font-medium mb-1">Perfect for:</div>
+                  <div>• Creative writing • Complex analysis • Multi-step reasoning • Educational content</div>
+                  <div className="text-xs mt-2 opacity-80">
+                    Get your key: <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">makersuite.google.com/app/apikey</a>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="openrouter" className="space-y-4">
+              {renderKeyInputs(
+                'OpenRouter 🎯 Specialized Tasks',
+                'Access to multiple specialized models for niche tasks and flexibility',
+                openrouterKeys,
+                'openrouter',
+                'sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                'bg-indigo-500'
+              )}
+              <Card className="bg-indigo-50 border-indigo-200">
+                <CardContent className="p-4 text-sm text-indigo-800">
+                  <div className="font-medium mb-1">Perfect for:</div>
+                  <div>• Specialized tasks • Model variety • Code generation • Translation</div>
+                  <div className="text-xs mt-2 opacity-80">
+                    Get your key: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="underline">openrouter.ai/keys</a>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
           <Card>
             <CardHeader>
-              <CardTitle>Instructions</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-amber-500" weight="fill" />
+                How It Works
+              </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground space-y-2">
-              <p>• Add multiple API keys for automatic rotation when rate limits are reached</p>
-              <p>• Perplexity keys: Get them from <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">perplexity.ai/settings/api</a></p>
-              <p>• Gemini keys: Get them from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">makersuite.google.com/app/apikey</a></p>
-              <p>• Leave empty if you don't have keys for a particular service</p>
-              <p>• Spark LLM is always available as a fallback</p>
+            <CardContent className="text-sm text-muted-foreground space-y-3">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <div className="font-medium text-foreground mb-1">🚀 Sequential Strategy (Fast)</div>
+                  <div>Groq → Gemini → OpenRouter → Spark LLM</div>
+                  <div className="text-xs opacity-80 mt-1">Tries services in order until one succeeds</div>
+                </div>
+                <div>
+                  <div className="font-medium text-foreground mb-1">🔄 Parallel Strategy (Comprehensive)</div>
+                  <div>All services respond simultaneously</div>
+                  <div className="text-xs opacity-80 mt-1">AI judges best response for quality</div>
+                </div>
+              </div>
+              <div className="pt-2 border-t">
+                <div className="font-medium text-foreground mb-1">💡 Key Management:</div>
+                <div>• Automatic rotation when rate limits hit • Multiple keys per service • Spark LLM always available as fallback</div>
+              </div>
             </CardContent>
           </Card>
 
@@ -208,7 +347,7 @@ export function SettingsDialog() {
             </Button>
             <Button onClick={handleSave} disabled={isLoading} className="gap-2">
               <Save className="w-4 h-4" />
-              {isLoading ? 'Saving...' : 'Save Keys'}
+              {isLoading ? 'Saving...' : 'Save Configuration'}
             </Button>
           </div>
         </div>

@@ -14,7 +14,7 @@ function App() {
 
   const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, strategy: 'fast' | 'comprehensive' = 'comprehensive') => {
     if (!content.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -29,8 +29,8 @@ function App() {
     setIsLoading(true);
 
     try {
-      // Get AI responses
-      const aiResponses = await AIService.getAIResponses(content);
+      // Get AI responses with selected strategy
+      const aiResponses = await AIService.getAIResponses(content, strategy);
       
       // Convert AI responses to messages
       const aiMessages: Message[] = aiResponses.map(response => ({
@@ -48,7 +48,17 @@ function App() {
       if (aiMessages.length === 0) {
         toast.error('No AI responses received');
       } else if (aiMessages.length > 1) {
-        toast.success('Multiple AI perspectives provided');
+        toast.success(`${aiMessages.length} AI perspectives provided`);
+      } else {
+        const source = aiMessages[0].source;
+        const sourceNames: Record<string, string> = {
+          'groq': 'Groq ⚡',
+          'perplexity': 'Perplexity 🌐',
+          'gemini': 'Gemini 🧐',
+          'openrouter': 'OpenRouter 🎯',
+          'spark-llm': 'Spark LLM 🔄'
+        };
+        toast.success(`Response from ${sourceNames[source] || source}`);
       }
 
     } catch (error) {

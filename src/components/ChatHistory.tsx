@@ -39,12 +39,14 @@ export function ChatHistory({ messages }: ChatHistoryProps) {
           </div>
           <h3 className="text-xl font-semibold mb-3 text-foreground">Welcome to AI Chat Assistant</h3>
           <p className="text-sm leading-relaxed mb-4">
-            Ask me anything! I'll provide thoughtful responses from multiple AI services including Perplexity AI and Google Gemini to give you comprehensive perspectives.
+            Ask me anything! I'll provide responses using our advanced multi-AI strategy with specialized services for speed, reasoning, and factual accuracy.
           </p>
           <div className="flex flex-wrap justify-center gap-2 text-xs">
-            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Perplexity AI</span>
-            <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">Google Gemini</span>
-            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Spark LLM</span>
+            <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Groq ⚡</span>
+            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Perplexity 🌐</span>
+            <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">Gemini 🧐</span>
+            <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">OpenRouter 🎯</span>
+            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Spark LLM 🔄</span>
           </div>
         </div>
       </div>

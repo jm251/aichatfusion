@@ -1,104 +1,128 @@
-# AI Chat Assistant - Product Requirements Document
+# AI Chat Assistant - Enhanced Multi-AI Strategy - Product Requirements Document
 
 ## Core Purpose & Success
-- **Mission Statement**: A robust AI chat application that provides multiple AI perspectives with automatic fallback and API key rotation for uninterrupted service.
-- **Success Indicators**: Consistent responses even during API rate limiting, clear identification of AI service sources, seamless user experience with minimal service interruptions.
-- **Experience Qualities**: Reliable, Intelligent, Professional
+- **Mission Statement**: An intelligent AI chat application that leverages multiple specialized AI services with smart routing, automatic fallback, and enhanced syntax highlighting for the optimal user experience.
+- **Success Indicators**: 
+  - Ultra-fast responses for interactive scenarios via Groq
+  - Comprehensive multi-AI perspectives for complex queries
+  - Seamless fallback during service outages
+  - Perfect code syntax highlighting and easy copying
+- **Experience Qualities**: Lightning-Fast, Comprehensive, Reliable
 
 ## Project Classification & Approach
-- **Complexity Level**: Light Application (multiple features with persistent state and external API integration)
-- **Primary User Activity**: Interacting (conversational AI chat with multiple services)
+- **Complexity Level**: Complex Application (advanced multi-AI routing, intelligent strategy selection)
+- **Primary User Activity**: Interacting (sophisticated AI conversations with specialized service routing)
 
 ## Essential Features
 
-### Multi-AI Service Integration
-- **Perplexity AI Integration**: Real-time web search and current information
-- **Google Gemini Integration**: Advanced reasoning and comprehensive responses
-- **Spark LLM Integration**: Always-available fallback service
-- **Concurrent Responses**: Get multiple AI perspectives simultaneously
+### Enhanced Multi-AI Strategy System
+- **Groq Integration ⚡**: Ultra-fast responses (3-second timeout) for real-time interactions
+- **Perplexity Integration 🌐**: Web-enhanced responses with current, factual information
+- **Gemini Integration 🧐**: Advanced reasoning for complex analysis and creative writing
+- **OpenRouter Integration 🎯**: Specialized models (Claude 3.5 Sonnet) for nuanced tasks
+- **Spark LLM Integration 🔄**: Always-available reliable fallback service
 
-### API Key Management & Rotation
-- **Automatic Key Rotation**: Cycle through multiple API keys per service
-- **Intelligent Fallback**: Switch to backup keys when rate limits are hit
-- **Service Status Monitoring**: Visual indicators of available services
-- **Graceful Degradation**: Continue functioning even if some services fail
+### Intelligent Response Strategies
+- **Fast Sequential Mode**: Groq → Gemini → OpenRouter → Spark (speed priority)
+- **Comprehensive Parallel Mode**: All services respond, AI judges best response
+- **Smart Response Analysis**: AI-powered evaluation of multiple responses for quality
+- **Automatic Service Selection**: Context-aware routing to optimal AI service
 
-### Chat Interface
-- **Real-time Messaging**: Instant message exchange with AI services
-- **Message Persistence**: Chat history saved across sessions
-- **Service Identification**: Clear labeling of which AI provided each response
-- **Error Handling**: Informative error messages with recovery suggestions
+### Enhanced Code & Syntax Features
+- **Professional Syntax Highlighting**: JetBrains Mono font with VS Code themes
+- **One-Click Code Copying**: Instant clipboard access for all code blocks
+- **Language Detection**: Automatic syntax highlighting for 100+ languages
+- **Mobile-Optimized**: Perfect code readability on all devices
+- **Copy Response Feature**: Easy copying of entire AI responses
+
+### Advanced API Management
+- **Multi-Key Rotation**: Support for unlimited keys per service with automatic cycling
+- **Intelligent Fallback Logic**: Smart retry mechanisms with exponential backoff
+- **Service Health Monitoring**: Real-time status tracking for all AI services
+- **Performance Tracking**: Response time monitoring and optimization
 
 ## Design Direction
 
 ### Visual Tone & Identity
-- **Emotional Response**: Professional confidence with modern sophistication
-- **Design Personality**: Clean, tech-forward, trustworthy
-- **Visual Metaphors**: Multi-layered intelligence, interconnected services
-- **Simplicity Spectrum**: Minimal interface with rich functionality underneath
+- **Emotional Response**: Confident professionalism with cutting-edge innovation
+- **Design Personality**: Sleek, futuristic, highly functional
+- **Visual Metaphors**: Multi-layered intelligence network, specialized expertise
+- **Simplicity Spectrum**: Clean minimalism with powerful functionality
 
-### Color Strategy
-- **Color Scheme Type**: Analogous with accent highlights
-- **Primary Color**: Deep blue (oklch(0.45 0.15 250)) - represents reliability and intelligence
-- **Secondary Colors**: Light blue-gray for cards and surfaces
-- **Accent Color**: Warm orange (oklch(0.65 0.15 45)) - for highlights and secondary AI responses
-- **Service-Specific Colors**: 
-  - Perplexity: Primary blue for authority
-  - Gemini: Orange accent for innovation
-  - Spark LLM: Neutral accent for consistency
+### Enhanced Color Strategy
+- **Color Scheme Type**: Service-specific color coding with harmonious palette
+- **Service Colors**:
+  - Groq ⚡: Orange (oklch(0.65 0.15 30)) - Speed and energy
+  - Perplexity 🌐: Blue (oklch(0.55 0.15 240)) - Knowledge and web
+  - Gemini 🧐: Emerald (oklch(0.55 0.15 150)) - Intelligence and reasoning
+  - OpenRouter 🎯: Indigo (oklch(0.55 0.15 270)) - Specialization and precision
+  - Spark LLM 🔄: Purple (oklch(0.55 0.15 300)) - Reliability and fallback
+- **Code Highlighting**: Dark theme for code blocks with VS Code color scheme
+- **Accessibility**: WCAG AA compliant contrast ratios throughout
 
 ### Typography System
-- **Font Choice**: Inter - modern, highly legible, tech-appropriate
-- **Hierarchy**: Clear distinction between headers, chat text, and metadata
-- **Readability**: Optimized line-height and spacing for extended reading
+- **Primary Font**: Inter - exceptional readability for chat interface
+- **Code Font**: JetBrains Mono - professional monospace for code display
+- **Font Hierarchy**: Clear distinction between services, code, and content
+- **Mobile Optimization**: Responsive font scaling for all devices
 
-### UI Elements & Component Selection
-- **Message Bubbles**: Distinct styling for each AI service
-- **Service Badges**: Clear identification of response sources
-- **Status Indicators**: Real-time service availability display
-- **Input Controls**: Clean, focused message input with send functionality
-- **Navigation**: Minimal header with essential controls
-
-### Animations
-- **Message Transitions**: Smooth fade-in for new messages
-- **Loading States**: Subtle pulse animations during AI processing
-- **Service Switching**: Gentle transitions when services change
+### Advanced UI Components
+- **Service-Coded Bubbles**: Distinct gradients and icons for each AI service
+- **Strategy Selector**: Fast vs Comprehensive mode toggle
+- **Enhanced Code Blocks**: Professional header with language and copy button
+- **Service Status Bar**: Real-time availability indicators
+- **Response Analytics**: Quality metrics and timing information
 
 ## Technical Implementation
 
-### API Integration
-- **Perplexity API**: Chat completions with web search capabilities
-- **Gemini API**: Content generation with advanced reasoning
-- **Rate Limit Handling**: Automatic key rotation on 429/403 errors
-- **Concurrent Requests**: Parallel API calls for faster responses
+### Multi-AI Architecture
+- **Parallel Processing**: Concurrent API calls for comprehensive responses
+- **Response Judging**: AI-powered evaluation of multiple responses
+- **Timeout Management**: Service-specific timeout handling (3s for Groq)
+- **Quality Assessment**: Common theme detection across responses
 
-### Data Management
-- **Message Storage**: Persistent chat history using useKV
-- **API Configuration**: Stored rotation indices and service status
-- **Error Recovery**: Graceful handling of network and API failures
+### Enhanced API Integration
+- **Groq API**: llama-3.1-70b-versatile for ultra-fast responses
+- **Perplexity API**: llama-3.1-sonar-large-128k-online for web-enhanced answers
+- **Gemini API**: gemini-1.5-pro-latest for complex reasoning
+- **OpenRouter API**: anthropic/claude-3.5-sonnet for specialized tasks
+- **Error Handling**: Graceful degradation with intelligent retry logic
 
-### Environment Configuration
-- **Multiple API Keys**: Support for 4+ keys per service
-- **Dynamic Detection**: Automatic service availability detection
-- **Secure Storage**: Environment-based API key management
+### Code Enhancement Features
+- **Syntax Highlighting**: React Syntax Highlighter with Prism.js
+- **Copy Functionality**: Navigator clipboard API with visual feedback
+- **Language Detection**: Automatic identification of code languages
+- **Theme Integration**: Dark/light theme support for code blocks
 
 ## User Experience Flow
 
-1. **Service Detection**: App automatically detects available AI services
-2. **Message Input**: User types message in clean input field
-3. **Concurrent Processing**: Multiple AI services process request simultaneously
-4. **Response Display**: Messages appear with clear service identification
-5. **Automatic Fallback**: If services fail, automatic switching to alternatives
-6. **History Persistence**: All conversations saved for future reference
+### Fast Mode Experience
+1. **User Input**: Types message with Fast Mode selected
+2. **Groq First**: 3-second attempt for ultra-fast response
+3. **Smart Fallback**: Automatic progression through Gemini → OpenRouter → Spark
+4. **Single Response**: Best response delivered quickly
+
+### Comprehensive Mode Experience
+1. **User Input**: Types message with Multi-AI mode selected
+2. **Parallel Processing**: All available services respond simultaneously
+3. **AI Analysis**: Intelligent evaluation of all responses
+4. **Multi-Perspective**: All responses displayed with service identification
+5. **Quality Metrics**: Response timing and confidence indicators
+
+### Code Interaction Flow
+1. **Code Detection**: Automatic syntax highlighting applied
+2. **Professional Display**: Clean header with language identification
+3. **Easy Copying**: One-click copy with visual confirmation
+4. **Mobile Friendly**: Optimized scrolling and readability
 
 ## Success Metrics
-- **Service Uptime**: Maintain functionality even during individual service outages
-- **Response Quality**: Multiple perspectives provide comprehensive answers
-- **User Satisfaction**: Clear service identification and reliable performance
-- **Error Recovery**: Seamless handling of API limitations and failures
+- **Response Speed**: Sub-5-second responses in Fast Mode
+- **Service Reliability**: 99%+ uptime through intelligent fallbacks
+- **Code Experience**: Perfect syntax highlighting and copying functionality
+- **User Satisfaction**: Seamless multi-AI experience with clear service benefits
 
-## Technical Considerations
-- **Environment Variables**: Secure API key management through .env configuration
-- **Error Boundaries**: Comprehensive error handling and user feedback
-- **Performance**: Optimized concurrent API calls and response handling
-- **Scalability**: Easy addition of new AI services and API keys
+## Innovation Features
+- **AI Response Judge**: Meta-AI evaluation of response quality
+- **Context-Aware Routing**: Automatic service selection based on query type
+- **Performance Analytics**: Real-time monitoring of service response times
+- **Enhanced Developer Experience**: Professional code handling and copying

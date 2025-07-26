@@ -41,10 +41,14 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
     
     // Different colors for different AI services with gradients
     switch (message.source) {
+      case 'groq':
+        return 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg border-orange-200';
       case 'perplexity':
         return 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg border-blue-200';
       case 'gemini':
         return 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg border-emerald-200';
+      case 'openrouter':
+        return 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg border-indigo-200';
       case 'spark-llm':
         return 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg border-purple-200';
       default:
@@ -56,8 +60,10 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
     if (isUser) return true;
     
     switch (message.source) {
+      case 'groq':
       case 'perplexity':
       case 'gemini':
+      case 'openrouter':
       case 'spark-llm':
         return true;
       default:
@@ -70,10 +76,14 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
     
     // Different icons based on AI service
     switch (message.source) {
+      case 'groq':
+        return <Robot className="w-5 h-5 text-orange-500" weight="fill" />;
       case 'perplexity':
         return <Robot className="w-5 h-5 text-blue-500" weight="fill" />;
       case 'gemini':
         return <Robot className="w-5 h-5 text-emerald-500" weight="fill" />;
+      case 'openrouter':
+        return <Robot className="w-5 h-5 text-indigo-500" weight="fill" />;
       case 'spark-llm':
         return <Robot className="w-5 h-5 text-purple-500" weight="fill" />;
       default:
@@ -86,12 +96,16 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
     
     const getServiceInfo = (source: string) => {
       switch (source) {
+        case 'groq':
+          return { name: 'Groq ⚡', color: 'bg-orange-100 text-orange-700 border-orange-200' };
         case 'perplexity':
-          return { name: 'Perplexity AI', color: 'bg-blue-100 text-blue-700 border-blue-200' };
+          return { name: 'Perplexity 🌐', color: 'bg-blue-100 text-blue-700 border-blue-200' };
         case 'gemini':
-          return { name: 'Google Gemini', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+          return { name: 'Gemini 🧐', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+        case 'openrouter':
+          return { name: 'OpenRouter 🎯', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' };
         case 'spark-llm':
-          return { name: 'Spark LLM', color: 'bg-purple-100 text-purple-700 border-purple-200' };
+          return { name: 'Spark LLM 🔄', color: 'bg-purple-100 text-purple-700 border-purple-200' };
         default:
           return { name: source, color: 'bg-slate-100 text-slate-700 border-slate-200' };
       }

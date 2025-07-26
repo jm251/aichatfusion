@@ -1,4 +1,4 @@
-export type AIService = 'perplexity' | 'gemini' | 'spark-llm';
+export type AIService = 'groq' | 'gemini' | 'perplexity' | 'openrouter' | 'spark-llm';
 
 export interface Message {
   id: string;
@@ -21,5 +21,22 @@ export interface AIResponse {
   source: AIService;
   success: boolean;
   error?: string;
-  keyUsed?: string; // Track which API key was used
+  keyUsed?: string;
+  responseTime?: number;
+  model?: string;
+}
+
+export interface APIStrategy {
+  speed: 'groq';
+  reasoning: 'gemini';
+  factual: 'perplexity';
+  specialized: 'openrouter';
+  fallback: 'spark-llm';
+}
+
+export interface ResponseAnalysis {
+  bestResponse: AIResponse;
+  confidence: number;
+  reasoning: string;
+  commonThemes: string[];
 }
