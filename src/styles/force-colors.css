@@ -1,0 +1,306 @@
+/* Force high contrast colors across entire codebase */
+
+/* Root level color forcing */
+* {
+  color: inherit !important;
+}
+
+/* Light mode - force dark text on white background */
+:root:not(.dark),
+:root:not(.dark) *,
+html:not(.dark),
+html:not(.dark) *,
+body:not(.dark),
+body:not(.dark) * {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Header specific fixes */
+:root:not(.dark) header,
+:root:not(.dark) header *,
+:root:not(.dark) h1,
+:root:not(.dark) .text-foreground {
+  color: #000000 !important;
+}
+
+/* Remove gradient text in light mode */
+:root:not(.dark) .bg-clip-text {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #000000 !important;
+  color: #000000 !important;
+}
+
+/* Dark mode - force white text on black background */
+.dark,
+.dark *,
+html.dark,
+html.dark *,
+body.dark,
+body.dark *,
+[data-theme="dark"],
+[data-theme="dark"] * {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Image Generation Dark Mode Fixes */
+.dark .image-gen-card {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+.dark .image-gen-input {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+.dark .image-gen-button {
+  background-color: #66b3ff !important;
+  color: #000000 !important;
+}
+
+/* Muted text overrides */
+.dark .text-muted-foreground,
+.dark [class*="muted"] {
+  color: #cccccc !important;
+}
+
+:root:not(.dark) .text-muted-foreground,
+:root:not(.dark) [class*="muted"] {
+  color: #666666 !important;
+}
+
+/* Card and component backgrounds */
+.dark .card,
+.dark [role="dialog"],
+.dark .popover {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+:root:not(.dark) .card,
+:root:not(.dark) [role="dialog"],
+:root:not(.dark) .popover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Input and button text */
+.dark input,
+.dark textarea,
+.dark button {
+  color: #ffffff !important;
+}
+
+:root:not(.dark) input,
+:root:not(.dark) textarea,
+:root:not(.dark) button {
+  color: #000000 !important;
+}
+
+/* Override any transparent or invisible text */
+.dark [style*="color: transparent"],
+.dark [style*="color: rgba(0,0,0,0)"] {
+  color: #ffffff !important;
+}
+
+:root:not(.dark) [style*="color: transparent"],
+:root:not(.dark) [style*="color: rgba(255,255,255,0)"] {
+  color: #000000 !important;
+}
+
+/* Image Generation Component Fixes */
+.image-gen-card {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.image-gen-input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #e8eaed !important;
+}
+
+.image-gen-button {
+  background-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+/* Tab Styling - Light Mode */
+:root:not(.dark) [role="tablist"],
+:root:not(.dark) .tabs-list {
+  background-color: #f8f9fa !important;
+}
+
+:root:not(.dark) [role="tab"],
+:root:not(.dark) .tabs-trigger {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+:root:not(.dark) [role="tab"][data-state="active"],
+:root:not(.dark) .tabs-trigger[data-state="active"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-bottom: 3px solid #1a73e8 !important;
+  font-weight: 600 !important;
+}
+
+:root:not(.dark) [role="tab"]:hover,
+:root:not(.dark) .tabs-trigger:hover {
+  background-color: #f1f3f4 !important;
+  color: #000000 !important;
+}
+
+/* Tab Styling - Dark Mode */
+.dark [role="tablist"],
+.dark .tabs-list {
+  background-color: #1a1a1a !important;
+}
+
+.dark [role="tab"],
+.dark .tabs-trigger {
+  background-color: #2d2d2d !important;
+  color: #cccccc !important;
+  border: 1px solid #404040 !important;
+}
+
+.dark [role="tab"][data-state="active"],
+.dark .tabs-trigger[data-state="active"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-bottom: 3px solid #66b3ff !important;
+  font-weight: 600 !important;
+}
+
+.dark [role="tab"]:hover,
+.dark .tabs-trigger:hover {
+  background-color: #404040 !important;
+  color: #ffffff !important;
+}
+
+/* Tab content styling */
+:root:not(.dark) [role="tabpanel"],
+:root:not(.dark) .tabs-content {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.dark [role="tabpanel"],
+.dark .tabs-content {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Checkbox visibility fixes */
+:root:not(.dark) [data-slot="checkbox"] {
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  color: #000000 !important;
+}
+
+:root:not(.dark) [data-slot="checkbox"][data-state="checked"] {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+:root:not(.dark) [data-slot="checkbox-indicator"] {
+  color: #ffffff !important;
+}
+
+.dark [data-slot="checkbox"] {
+  background-color: #1f2937 !important;
+  border: 2px solid #6b7280 !important;
+  color: #ffffff !important;
+}
+
+.dark [data-slot="checkbox"][data-state="checked"] {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+.dark [data-slot="checkbox-indicator"] {
+  color: #ffffff !important;
+}
+
+/* Ensure checkbox is always visible and clickable */
+[data-slot="checkbox"] {
+  min-width: 16px !important;
+  min-height: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Force checkbox indicator visibility */
+[data-slot="checkbox-indicator"] svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke-width: 2.5 !important;
+}
+
+/* Enhanced syntax highlighting - non-conflicting */
+.markdown-chunk .hljs {
+  background: #ffffff;
+  color: #24292e;
+  border: 1px solid #e1e4e8;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: auto !important;
+}
+
+.dark .markdown-chunk .hljs {
+  background: #0d1117;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: auto !important;
+}
+
+/* Code block spacing fix */
+.markdown-chunk > div {
+  margin-bottom: 1rem;
+}
+
+.markdown-chunk > div:last-child {
+  margin-bottom: 0;
+}
+
+/* Fix SyntaxHighlighter specific issues */
+.react-syntax-highlighter {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+/* Override table-based syntax highlighter layouts */
+.react-syntax-highlighter table {
+  display: table !important;
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+.react-syntax-highlighter td {
+  vertical-align: top !important;
+}
+
+/* Ensure line numbers don't cause overflow */
+.react-syntax-highlighter .linenumber {
+  user-select: none;
+  text-align: right;
+  padding-right: 1em;
+  opacity: 0.5;
+}
+
+/* Remove previous code block background overrides to allow index.css to control */

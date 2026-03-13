@@ -1,134 +1,131 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash, Robot, Lightbulb, CheckCircle } from '@phosphor-icons/react';
-import { AIService } from '@/lib/ai-service';
-import { SettingsDialog } from './SettingsDialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Trash, Sparkles, MessageCircleMore } from 'lucide-react';
+import { ThemeToggle } from './ui/theme-toggle';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+const SettingsDialog = lazy(() => import('./SettingsDialog').then(module => ({ default: module.SettingsDialog })));
+const CreditsDialog = lazy(() => import('./CreditsDialog').then(module => ({ default: module.CreditsDialog })));
+const BlogDialog = lazy(() => import('./BlogDialog').then(module => ({ default: module.BlogDialog })));
 
 interface ChatHeaderProps {
   messageCount: number;
   onClearHistory: () => void;
+  onDeleteAllChats?: () => void;
   isLoading?: boolean;
 }
 
-export function ChatHeader({ messageCount, onClearHistory, isLoading }: ChatHeaderProps) {
-  const [configuredServices, setConfiguredServices] = useState({
-    groq: false,
-    perplexity: false,
-    gemini: false,
-    openrouter: false,
-    sparkLLM: true
-  });
-
-  useEffect(() => {
-    const updateServices = async () => {
-      try {
-        const services = await AIService.getConfiguredServices();
-        setConfiguredServices(services);
-      } catch (error) {
-        console.error('Failed to get configured services:', error);
-      }
-    };
-    
-    updateServices();
-    
-    // Update services when dialog closes (settings change)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        updateServices();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  const getServiceStatus = () => {
-    const services = [];
-    if (configuredServices.groq) services.push('Groq');
-    if (configuredServices.perplexity) services.push('Perplexity');
-    if (configuredServices.gemini) services.push('Gemini');
-    if (configuredServices.openrouter) services.push('OpenRouter');
-    if (configuredServices.sparkLLM) services.push('Spark LLM');
-    
-    return services.length > 0 ? services.join(' + ') : 'No services configured';
-  };
+export function ChatHeader({ messageCount, onClearHistory, onDeleteAllChats, isLoading }: ChatHeaderProps) {
+  const statusLabel = isLoading ? 'Thinking' : 'Ready';
+  const statusColor = isLoading ? 'bg-amber-500' : 'bg-emerald-500';
 
   return (
-    <div className="flex items-center justify-between p-6 border-b bg-white/80 backdrop-blur-lg shadow-sm">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
-            <Robot className="w-6 h-6 text-white" weight="fill" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">AI Chat Assistant</h1>
-            <p className="text-xs text-muted-foreground">Powered by multiple AI services</p>
+    <header className="sticky top-0 z-20 w-full border-b border-border/70 bg-background/90 backdrop-blur-md header-surface">
+      <div className="mx-auto flex h-[3.5rem] sm:h-[3.75rem] max-w-7xl items-center justify-between gap-2 px-2 sm:px-4 lg:px-6">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <SidebarTrigger className="flex-shrink-0" />
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="hidden h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary sm:flex">
+              <MessageCircleMore className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-semibold sm:text-base font-display header-title-gradient section-title">
+                AI Chat Fusion
+              </h1>
+              <p className="hidden text-[11px] text-muted-foreground md:block">
+                Multi-model chat workspace
+              </p>
+            </div>
           </div>
         </div>
-        {messageCount > 0 && (
-          <Badge variant="secondary" className="px-3 py-1 text-xs font-medium">
-            {messageCount} messages
-          </Badge>
-        )}
-      </div>
-      
-      <div className="flex items-center gap-3">
-        {isLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            <span>AI thinking...</span>
-          </div>
-        )}
-        
-        <div className="hidden md:flex items-center gap-2">
-          {configuredServices.groq && (
-            <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" weight="fill" />
-              Groq ⚡
-            </div>
-          )}
-          {configuredServices.perplexity && (
-            <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" weight="fill" />
-              Perplexity 🌐
-            </div>
-          )}
-          {configuredServices.gemini && (
-            <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" weight="fill" />
-              Gemini 🧐
-            </div>
-          )}
-          {configuredServices.openrouter && (
-            <div className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" weight="fill" />
-              OpenRouter 🎯
-            </div>
-          )}
-          {configuredServices.sparkLLM && (
-            <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" weight="fill" />
-              Spark LLM 🔄
-            </div>
-          )}
-        </div>
-        
-        <SettingsDialog />
-        
-        {messageCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClearHistory}
-            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            disabled={isLoading}
+
+        <div className="flex min-w-0 items-center gap-1 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div
+            className="hidden items-center gap-2 rounded-full border border-border/70 bg-card/70 px-3 py-1 text-[11px] text-muted-foreground lg:inline-flex"
+            role="status"
+            aria-live="polite"
           >
-            <Trash className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Clear</span>
-          </Button>
-        )}
+            <span className={`h-2 w-2 rounded-full ${statusColor} ${isLoading ? 'animate-pulse' : ''}`} />
+            {statusLabel}
+          </div>
+
+          <Badge variant="secondary" className="hidden border-border/70 bg-card/70 md:inline-flex">
+            {messageCount} {messageCount === 1 ? 'message' : 'messages'}
+          </Badge>
+
+          {messageCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden h-8 border border-border/60 bg-card/60 text-xs md:inline-flex"
+              onClick={onClearHistory}
+              disabled={isLoading}
+            >
+              Clear Chat
+            </Button>
+          )}
+
+          <Suspense fallback={<Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />}>
+            <BlogDialog />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />}>
+            <SettingsDialog />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />}>
+            <CreditsDialog />
+          </Suspense>
+          <ThemeToggle />
+
+          {messageCount > 0 && onDeleteAllChats && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 sm:h-9 sm:w-9"
+                  disabled={isLoading}
+                  aria-label="Delete all chats"
+                  title="Delete all chats"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete all chat history</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently removes all saved conversations and cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onDeleteAllChats}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete all
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
+          {isLoading && <Sparkles className="hidden h-4 w-4 text-primary animate-pulse lg:block" />}
+        </div>
       </div>
-    </div>
+    </header>
   );
 }

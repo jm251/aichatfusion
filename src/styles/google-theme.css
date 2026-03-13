@@ -1,0 +1,141 @@
+/* Google Material Design Theme */
+:root {
+  /* Light Theme - Google Material Design */
+  --background: #ffffff;
+  --foreground: #1f1f1f;
+  
+  --card: #ffffff;
+  --card-foreground: #1f1f1f;
+  --popover: #ffffff;
+  --popover-foreground: #1f1f1f;
+  
+  --primary: #1a73e8;
+  --primary-foreground: #ffffff;
+  --secondary: #f8f9fa;
+  --secondary-foreground: #1f1f1f;
+  
+  --muted: #f8f9fa;
+  --muted-foreground: #5f6368;
+  --accent: #34a853;
+  --accent-foreground: #ffffff;
+  
+  --destructive: #ea4335;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e8eaed;
+  --input: #f8f9fa;
+  --ring: #1a73e8;
+  
+  --radius: 8px;
+}
+
+.dark {
+  /* High Contrast Dark Theme */
+  --background: #000000;
+  --foreground: #ffffff;
+  
+  --card: #111111;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  
+  --primary: #66b3ff;
+  --primary-foreground: #000000;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  
+  --muted: #1a1a1a;
+  --muted-foreground: #cccccc;
+  --accent: #00ff88;
+  --accent-foreground: #000000;
+  
+  --destructive: #ff6666;
+  --destructive-foreground: #000000;
+  
+  --border: #444444;
+  --input: #1a1a1a;
+  --ring: #66b3ff;
+}
+
+/* Force text visibility */
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+* {
+  color: inherit !important;
+}
+
+/* Ensure all elements inherit proper colors */
+div, span, p, h1, h2, h3, h4, h5, h6, label, button {
+  color: inherit !important;
+}
+
+/* Force background and text colors on root elements */
+#root {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Light mode text fixes */
+:root:not(.dark) {
+  color: #1f1f1f !important;
+}
+
+:root:not(.dark) * {
+  color: inherit !important;
+}
+
+:root:not(.dark) .text-muted-foreground {
+  color: #5f6368 !important;
+}
+
+:root:not(.dark) body {
+  background-color: #ffffff !important;
+  color: #1f1f1f !important;
+}
+
+/* High contrast dark mode text fixes */
+.dark {
+  color: #ffffff !important;
+}
+
+.dark * {
+  color: inherit !important;
+}
+
+.dark .text-muted-foreground {
+  color: #cccccc !important;
+}
+
+.dark body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Card backgrounds */
+.card {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border-color: var(--border);
+}
+
+/* Button styles */
+button {
+  color: inherit;
+}
+
+/* Input styles */
+input, textarea {
+  background-color: var(--input);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+/* Dialog styles */
+[role="dialog"] {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border-color: var(--border);
+}

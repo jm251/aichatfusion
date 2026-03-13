@@ -15,13 +15,34 @@ try {
 const defaultTheme = {
   container: {
     center: true,
-    padding: "2rem",
+    padding: {
+      DEFAULT: "1rem",
+      xs: "1rem",
+      sm: "1.5rem", 
+      md: "2rem",
+      lg: "2rem",
+      xl: "2rem",
+      "2xl": "3rem",
+    },
   },
   extend: {
     screens: {
+      '2xs': '320px', // Add ultra small screen breakpoint
+      xs: "475px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      "3xl": "1920px", // Add extra large screens
       coarse: { raw: "(pointer: coarse)" },
       fine: { raw: "(pointer: fine)" },
       pwa: { raw: "(display-mode: standalone)" },
+    },
+    width: {
+      'fit': 'fit-content',
+      'min': 'min-content',
+      'max': 'max-content',
     },
     colors: {
       neutral: {
@@ -52,6 +73,8 @@ const defaultTheme = {
         contrast: "var(--color-neutral-contrast)",
       },
       accent: {
+        DEFAULT: "var(--accent)",
+        foreground: "var(--accent-foreground)",
         1: "var(--color-accent-1)",
         2: "var(--color-accent-2)",
         3: "var(--color-accent-3)",
@@ -89,6 +112,56 @@ const defaultTheme = {
         DEFAULT: "var(--color-bg)",
         inset: "var(--color-bg-inset)",
         overlay: "var(--color-bg-overlay)",
+      },
+      background: "var(--background)",
+      foreground: "var(--foreground)",
+      card: {
+        DEFAULT: "var(--card)",
+        foreground: "var(--card-foreground)",
+      },
+      popover: {
+        DEFAULT: "var(--popover)",
+        foreground: "var(--popover-foreground)",
+      },
+      primary: {
+        DEFAULT: "var(--primary)",
+        foreground: "var(--primary-foreground)",
+      },
+      secondary: {
+        DEFAULT: "var(--secondary)",
+        foreground: "var(--secondary-foreground)",
+      },
+      muted: {
+        DEFAULT: "var(--muted)",
+        foreground: "var(--muted-foreground)",
+      },
+      destructive: {
+        DEFAULT: "var(--destructive)",
+        foreground: "var(--destructive-foreground)",
+      },
+      border: "var(--border)",
+      input: "var(--input)",
+      ring: "var(--ring)",
+      // Service-specific colors
+      groq: {
+        DEFAULT: "var(--color-groq)",
+        contrast: "var(--color-groq-contrast)",
+      },
+      gemini: {
+        DEFAULT: "var(--color-gemini)",
+        contrast: "var(--color-gemini-contrast)",
+      },
+      openrouter: {
+        DEFAULT: "var(--color-openrouter)",
+        contrast: "var(--color-openrouter-contrast)",
+      },
+      github: {
+        DEFAULT: "var(--color-github)",
+        contrast: "var(--color-github-contrast)",
+      },
+      cohere: {
+        DEFAULT: "var(--color-cohere)",
+        contrast: "var(--color-cohere-contrast)",
       },
       "focus-ring": "var(--color-focus-ring)",
     },
@@ -143,5 +216,10 @@ const defaultTheme = {
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: { ...defaultTheme, ...theme },
+  theme: {
+    ...defaultTheme,
+    ...(theme?.theme || {}),
+  },
+  plugins: [],
+  darkMode: defaultTheme.darkMode,
 };

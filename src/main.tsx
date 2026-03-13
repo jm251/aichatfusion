@@ -1,16 +1,23 @@
-import { createRoot } from 'react-dom/client'
+import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
-import "@github/spark/spark"
 
-import App from './App.tsx'
-import { ErrorFallback } from './ErrorFallback.tsx'
+import App from "./App.tsx";
+import { ErrorFallback } from "./ErrorFallback.tsx";
+import { ThemeProvider } from "./components/theme-provider.tsx";
 
-import "./main.css"
-import "./styles/theme.css"
-import "./index.css"
+// Import CSS in the correct order for proper layering
+import "./styles/theme.css";
+import "./main.css";
+import "./index.css";
 
-createRoot(document.getElementById('root')!).render(
+import "./lib/spark-mock.ts";
+
+createRoot(document.getElementById("root")!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <App />
-   </ErrorBoundary>
-)
+    <ThemeProvider defaultTheme="system" storageKey="ai-chat-theme">
+      <div id="spark-app" className="min-h-screen w-full">
+        <App />
+      </div>
+    </ThemeProvider>
+  </ErrorBoundary>
+);

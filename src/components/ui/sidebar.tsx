@@ -3,7 +3,7 @@
 import { CSSProperties, ComponentProps, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import PanelLeftIcon from "lucide-react/dist/esm/icons/panel-left"
+import { PanelLeftOpen,PanelRightOpen } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -68,7 +68,7 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = useState(false)
-
+  
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = useState(defaultOpen)
@@ -258,24 +258,52 @@ function SidebarTrigger({
   onClick,
   ...props
 }: ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, state } = useSidebar();
 
   return (
-    <Button
-      data-sidebar="trigger"
-      data-slot="sidebar-trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("size-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          data-sidebar="trigger"
+          data-slot="sidebar-trigger"
+          data-state={state}
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-9 w-9 sm:h-10 sm:w-10",
+            "rounded-lg transition-colors duration-200",
+            "hover:bg-accent hover:text-accent-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            className
+          )}
+          onClick={(event) => {
+            onClick?.(event)
+            toggleSidebar()
+          }}
+          aria-label={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+          aria-expanded={state === "expanded"}
+          {...props}
+        >
+          {state === "expanded" ? (
+            <PanelLeftOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+          ) : (
+            <PanelRightOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+          )}
+          
+          <span className="sr-only">
+            {state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+          </span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent 
+        side="right" 
+        className="text-xs"
+        sideOffset={5}
+      >
+        <p>{state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}</p>
+        <p className="text-muted-foreground">Ctrl/Cmd + B</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -724,3 +752,4 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+

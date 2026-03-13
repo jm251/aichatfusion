@@ -1,13 +1,17 @@
 # AI Chat Assistant - Enhanced Multi-AI Strategy - Product Requirements Document
 
 ## Core Purpose & Success
-- **Mission Statement**: An intelligent AI chat application that leverages multiple specialized AI services with smart routing, automatic fallback, and enhanced syntax highlighting for the optimal user experience.
+- **Mission Statement**: An intelligent AI chat application that leverages multiple specialized AI services with smart routing and automatic fallback for the optimal user experience.
 - **Success Indicators**: 
   - Ultra-fast responses for interactive scenarios via Groq
   - Comprehensive multi-AI perspectives for complex queries
+  - GPT-4o-mini integration for reliable, free-tier OpenAI access
+  - Access to free powerful models via OpenRouter
+  - Advanced model capabilities via GitHub Models
+  - Natural conversational AI via Cohere
   - Seamless fallback during service outages
   - Perfect code syntax highlighting and easy copying
-- **Experience Qualities**: Lightning-Fast, Comprehensive, Reliable
+- **Experience Qualities**: Lightning-Fast, Comprehensive, Reliable, Free-Tier Friendly
 
 ## Project Classification & Approach
 - **Complexity Level**: Complex Application (advanced multi-AI routing, intelligent strategy selection)
@@ -17,13 +21,15 @@
 
 ### Enhanced Multi-AI Strategy System
 - **Groq Integration ⚡**: Ultra-fast responses (3-second timeout) for real-time interactions
-- **Perplexity Integration 🌐**: Web-enhanced responses with current, factual information
 - **Gemini Integration 🧐**: Advanced reasoning for complex analysis and creative writing
-- **OpenRouter Integration 🎯**: Specialized models (Claude 3.5 Sonnet) for nuanced tasks
-- **Spark LLM Integration 🔄**: Always-available reliable fallback service
+- **OpenAI Integration 🤖**: GPT-4o-mini for reliable, fast responses with free tier access
+- **OpenRouter Integration 🔗**: Access to multiple powerful AI models through a single API
+- **GitHub Models Integration 🚀**: Cutting-edge models including DeepSeek, Grok, Llama, and Mistral
+- **Cohere Integration 💬**: Natural conversational AI with Command-R models
+- **Gemini Image Generation 🎨**: Create and edit images using Gemini 2.5 Flash Image Preview model with Nano Banana capabilities
 
 ### Intelligent Response Strategies
-- **Fast Sequential Mode**: Groq → Gemini → OpenRouter → Spark (speed priority)
+- **Fast Sequential Mode**: Groq (3s timeout) → Gemini → OpenAI → Cohere → GitHub → OpenRouter
 - **Comprehensive Parallel Mode**: All services respond, AI judges best response
 - **Smart Response Analysis**: AI-powered evaluation of multiple responses for quality
 - **Automatic Service Selection**: Context-aware routing to optimal AI service
@@ -35,11 +41,24 @@
 - **Mobile-Optimized**: Perfect code readability on all devices
 - **Copy Response Feature**: Easy copying of entire AI responses
 
+### Image Generation Features (NEW)
+- **Nano Banana Integration 🍌**: Advanced image editing inspired by Google's Nano Banana model
+- **Gemini 2.5 Flash Image 🎨**: State-of-the-art image generation and editing
+- **Image Upload Support**: Select and upload images for editing
+- **Multi-turn Editing**: Iterative image refinement with context preservation
+- **Virtual Try-On**: Apply clothing and accessories to uploaded photos
+- **Interior Design**: Transform room images with AI-powered suggestions
+- **Photo Blending**: Combine multiple images naturally
+
 ### Advanced API Management
 - **Multi-Key Rotation**: Support for unlimited keys per service with automatic cycling
+- **Environment-Based Configuration**: API keys are loaded from environment variables at startup
 - **Intelligent Fallback Logic**: Smart retry mechanisms with exponential backoff
 - **Service Health Monitoring**: Real-time status tracking for all AI services
 - **Performance Tracking**: Response time monitoring and optimization
+- **Settings Interface**: Visual configuration interface that guides users to proper setup
+
+**Note**: The current implementation requires environment variables (.env.local) for API keys. The settings dialog provides configuration guidance and validation but requires app restart for changes to take effect.
 
 ## Design Direction
 
@@ -53,10 +72,12 @@
 - **Color Scheme Type**: Service-specific color coding with harmonious palette
 - **Service Colors**:
   - Groq ⚡: Orange (oklch(0.65 0.15 30)) - Speed and energy
-  - Perplexity 🌐: Blue (oklch(0.55 0.15 240)) - Knowledge and web
   - Gemini 🧐: Emerald (oklch(0.55 0.15 150)) - Intelligence and reasoning
-  - OpenRouter 🎯: Indigo (oklch(0.55 0.15 270)) - Specialization and precision
-  - Spark LLM 🔄: Purple (oklch(0.55 0.15 300)) - Reliability and fallback
+  - OpenAI 🤖: Teal (oklch(0.55 0.15 180)) - Reliability and innovation
+  - OpenRouter 🔗: Purple (oklch(0.55 0.15 300)) - Flexibility and fallback
+  - GitHub Models 🚀: Indigo (oklch(0.55 0.15 270)) - Advanced capabilities
+  - Cohere 💬: Sky Blue (oklch(0.60 0.12 210)) - Conversation and dialogue
+  - Gemini Image 🎨: Violet (oklch(0.55 0.15 280)) - Creative image generation
 - **Code Highlighting**: Dark theme for code blocks with VS Code color scheme
 - **Accessibility**: WCAG AA compliant contrast ratios throughout
 
@@ -83,9 +104,12 @@
 
 ### Enhanced API Integration
 - **Groq API**: llama-3.1-70b-versatile for ultra-fast responses
-- **Perplexity API**: llama-3.1-sonar-large-128k-online for web-enhanced answers
 - **Gemini API**: gemini-1.5-pro-latest for complex reasoning
-- **OpenRouter API**: anthropic/claude-3.5-sonnet for specialized tasks
+- **OpenAI API**: gpt-4o-mini for reliable, fast responses with free tier access
+- **OpenRouter API**: Multiple advanced models for reliable fallback and specialized capabilities
+- **GitHub Models API**: DeepSeek (R1, V3), Grok (3, 3-mini), Llama 4 Scout, Mistral Codestral, Microsoft MAI-DS-R1, OpenAI GPT-4.1
+- **Cohere API**: command-r and command-r-plus for natural conversational AI
+- **Gemini Image API**: gemini-2.5-flash-image-preview for advanced image generation and editing
 - **Error Handling**: Graceful degradation with intelligent retry logic
 
 ### Code Enhancement Features
@@ -94,13 +118,19 @@
 - **Language Detection**: Automatic identification of code languages
 - **Theme Integration**: Dark/light theme support for code blocks
 
+### Latency Optimization (NEW):
+  - Fast Mode starts at Groq and falls back deterministically to Gemini, OpenAI, Cohere, GitHub Models, then OpenRouter.
+  - OpenAI GPT-4o-mini positioned in fallback chain for optimal reliability.
+  - Parallel Mode post-processing sorts responses by ascending response time so the UI can surface fastest answers first.
+  - Maintains per-service live status updates while reordering only the final aggregated list.
+
 ## User Experience Flow
 
 ### Fast Mode Experience
 1. **User Input**: Types message with Fast Mode selected
-2. **Groq First**: 3-second attempt for ultra-fast response
-3. **Smart Fallback**: Automatic progression through Gemini → OpenRouter → Spark
-4. **Single Response**: Best response delivered quickly
+2. **Primary First Response**: Groq starts first (3s timeout), then fallback continues in deterministic order.
+3. **Fallback Order**: Gemini → OpenAI → Cohere → GitHub → OpenRouter
+4. **Single Response**: Fastest successful response returned early
 
 ### Comprehensive Mode Experience
 1. **User Input**: Types message with Multi-AI mode selected
@@ -117,6 +147,7 @@
 
 ## Success Metrics
 - **Response Speed**: Sub-5-second responses in Fast Mode
+- **Median First Token / First Answer Time (NEW)**: Reduced via speculative concurrency (target <2s with warm keys)
 - **Service Reliability**: 99%+ uptime through intelligent fallbacks
 - **Code Experience**: Perfect syntax highlighting and copying functionality
 - **User Satisfaction**: Seamless multi-AI experience with clear service benefits
@@ -126,3 +157,5 @@
 - **Context-Aware Routing**: Automatic service selection based on query type
 - **Performance Analytics**: Real-time monitoring of service response times
 - **Enhanced Developer Experience**: Professional code handling and copying
+- **Conversational Excellence**: Natural dialogue flow with Cohere integration
+- **OpenAI Integration**: Free-tier GPT-4o-mini for additional reliability
