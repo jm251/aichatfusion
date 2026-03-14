@@ -32,6 +32,47 @@ export class FirebaseService {
   private static db: Firestore | null = null;
   private static initialized = false;
   private static currentUserId: string | null = null;
+  private static localSessionId: string | null = null;
+
+  private static readClientStorage(key: string): string | null {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      return window.localStorage.getItem(key);
+    } catch (error) {
+      console.warn(`Failed to read "${key}" from localStorage:`, error);
+      return null;
+    }
+  }
+
+  private static writeClientStorage(key: string, value: string): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (error) {
+      console.warn(`Failed to write "${key}" to localStorage:`, error);
+    }
+  }
+
+  static getOrCreateLocalSessionId(): string {
+    if (this.localSessionId) {
+      return this.localSessionId;
+    }
+
+    const storageKey = 'local-session-id';
+    const existing = this.readClientStorage(storageKey);
+
+    if (existing) {
+      this.localSessionId = existing;
+      return existing;
+    }
+
+    const localId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    this.localSessionId = localId;
+    this.writeClientStorage(storageKey, localId);
+    return localId;
+  }
 
   static async initialize(): Promise<void> {
     if (this.initialized) return;
@@ -77,13 +118,7 @@ export class FirebaseService {
     
     // If Firebase is not configured or failed, return a local session ID
     if (!this.auth || !this.currentUserId) {
-      // Generate or retrieve a local session ID
-      let localId = localStorage.getItem('local-session-id');
-      if (!localId) {
-        localId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('local-session-id', localId);
-      }
-      return localId;
+      return this.getOrCreateLocalSessionId();
     }
     
     return this.currentUserId;

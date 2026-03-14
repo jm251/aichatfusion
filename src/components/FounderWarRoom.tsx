@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, type ReactNode, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 
 import {
   ArrowUpRight,
@@ -98,8 +98,28 @@ const BACKSTAGE_AGENTS = [
   { name: "Judge", detail: "Synthesizes the strongest final answer." },
 ];
 
+const BOOTSTRAP_TIMEOUT_MS = 6500;
+
 function summarizeText(value: string, limit = 420): string {
   return value.replace(/\s+/g, " ").trim().slice(0, limit);
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      reject(new Error(`${label} timed out`));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        window.clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error) => {
+        window.clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
 }
 
 function sortWorkspaces(workspaces: FounderWorkspace[]): FounderWorkspace[] {
@@ -372,6 +392,42 @@ export function FounderWarRoom() {
   const readyArtifacts = activeWorkspace?.artifacts.filter((artifact) => artifact.status === "ready").length || 0;
   const latestRehearsal = activeWorkspace?.rehearsalSessions[0];
   const isBusy = Boolean(busyAction);
+
+  const applyWorkspaceSnapshot = useEffectEvent((
+    nextWorkspaces: FounderWorkspace[],
+    nextActiveWorkspaceId?: string | null,
+  ) => {
+    const sorted = sortWorkspaces(nextWorkspaces);
+    const selectedWorkspace =
+      sorted.find((workspace) => workspace.id === nextActiveWorkspaceId) || sorted[0] || null;
+
+    setWorkspaces(sorted);
+    setActiveWorkspaceId(selectedWorkspace?.id || null);
+    setBriefDraft(
+      selectedWorkspace
+        ? createDraftFromWorkspace(selectedWorkspace)
+        : createEmptyFounderWorkspace().brief,
+    );
+    setSearchQuery(
+      selectedWorkspace ? FounderWarRoomService.createSearchQuery(selectedWorkspace) : "",
+    );
+    setUrlInput("");
+    setCopilotPrompt("");
+    lastSelectedWorkspaceIdRef.current = selectedWorkspace?.id || null;
+  });
+
+  const createFallbackWorkspace = useEffectEvent((nextUserId: string | null, reason: string) => {
+    const workspace = createEmptyFounderWorkspace();
+    applyWorkspaceSnapshot([workspace], workspace.id);
+
+    if (nextUserId) {
+      void FounderWorkspaceStorage.saveWorkspace(nextUserId, workspace).catch((error) => {
+        console.warn(`Failed to persist fallback workspace after ${reason}:`, error);
+      });
+    }
+
+    return workspace;
+  });
 
   async function persistWorkspace(workspace: FounderWorkspace): Promise<FounderWorkspace> {
     const nextWorkspace = {
@@ -983,31 +1039,49 @@ export function FounderWarRoom() {
 
     const initialize = async () => {
       setIsHydrating(true);
-      await FirebaseService.initialize();
-      const uid = await FirebaseService.getCurrentUserId();
+      let uid: string | null = null;
+
+      try {
+        await withTimeout(
+          FirebaseService.initialize(),
+          BOOTSTRAP_TIMEOUT_MS,
+          "Founder bootstrap",
+        );
+        uid = await withTimeout(
+          FirebaseService.getCurrentUserId(),
+          BOOTSTRAP_TIMEOUT_MS,
+          "Founder session bootstrap",
+        );
+      } catch (error) {
+        console.warn("Founder bootstrap fell back to local mode:", error);
+        uid = FirebaseService.getOrCreateLocalSessionId();
+      }
 
       if (cancelled) return;
 
       setUserId(uid);
       setStorageMode(FirebaseService.getStorageMode());
 
-      const loaded = uid ? await FounderWorkspaceStorage.listWorkspaces(uid) : [];
+      let loaded: FounderWorkspace[] = [];
+
+      if (uid) {
+        try {
+          loaded = await withTimeout(
+            FounderWorkspaceStorage.listWorkspaces(uid),
+            BOOTSTRAP_TIMEOUT_MS,
+            "Founder workspace restore",
+          );
+        } catch (error) {
+          console.warn("Founder workspace restore failed, using fallback workspace:", error);
+        }
+      }
+
       if (cancelled) return;
 
       if (loaded.length === 0) {
-        const workspace = createEmptyFounderWorkspace();
-        setWorkspaces([workspace]);
-        setActiveWorkspaceId(workspace.id);
-        setBriefDraft(createDraftFromWorkspace(workspace));
-        setSearchQuery(FounderWarRoomService.createSearchQuery(workspace));
-        if (uid) {
-          await FounderWorkspaceStorage.saveWorkspace(uid, workspace);
-        }
+        createFallbackWorkspace(uid, "bootstrap");
       } else {
-        setWorkspaces(loaded);
-        setActiveWorkspaceId(loaded[0].id);
-        setBriefDraft(createDraftFromWorkspace(loaded[0]));
-        setSearchQuery(FounderWarRoomService.createSearchQuery(loaded[0]));
+        applyWorkspaceSnapshot(loaded, loaded[0].id);
       }
 
       setIsHydrating(false);
@@ -1016,6 +1090,14 @@ export function FounderWarRoom() {
     initialize().catch((error) => {
       console.error("Founder War Room init failed:", error);
       toast.error("Failed to initialize Founder War Room");
+      const fallbackUserId = FirebaseService.getOrCreateLocalSessionId();
+
+      if (!cancelled) {
+        setUserId(fallbackUserId);
+        setStorageMode("local");
+        createFallbackWorkspace(fallbackUserId, "initialization failure");
+      }
+
       setIsHydrating(false);
     });
 
@@ -1026,7 +1108,22 @@ export function FounderWarRoom() {
         URL.revokeObjectURL(audioPreviewObjectUrlRef.current);
       }
     };
-  }, []);
+  }, [applyWorkspaceSnapshot, createFallbackWorkspace]);
+
+  useEffect(() => {
+    if (isHydrating || activeWorkspace) return;
+
+    if (workspaces.length > 0) {
+      const recoveredWorkspace = sortWorkspaces(workspaces)[0];
+      applyWorkspaceSnapshot(workspaces, recoveredWorkspace.id);
+      return;
+    }
+
+    const fallbackUserId = userId || FirebaseService.getOrCreateLocalSessionId();
+    setUserId(fallbackUserId);
+    setStorageMode("local");
+    createFallbackWorkspace(fallbackUserId, "workspace recovery");
+  }, [activeWorkspace, applyWorkspaceSnapshot, createFallbackWorkspace, isHydrating, userId, workspaces]);
 
   useEffect(() => {
     if (!activeWorkspaceId) return;
