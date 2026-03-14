@@ -47,3 +47,5 @@ packages
 .tmp/
 backend/
 qa/screenshots/
+
+.vercel

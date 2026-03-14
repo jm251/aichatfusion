@@ -24,6 +24,7 @@ import {
   Firestore 
 } from 'firebase/firestore';
 import { Message, FirebaseChat } from './types';
+import { FounderWorkspace } from './founder-types';
 
 export class FirebaseService {
   private static app: FirebaseApp | null = null;
@@ -90,6 +91,10 @@ export class FirebaseService {
 
   static getStorageMode(): 'local' | 'cloud' {
     return this.auth && this.db && this.currentUserId ? 'cloud' : 'local';
+  }
+
+  private static sanitizeForFirestore<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value)) as T;
   }
 
   static async saveChat(messages: Message[]): Promise<string | null> {
@@ -363,6 +368,52 @@ export class FirebaseService {
       await deleteDoc(docRef);
     } catch (error) {
       console.error('Error deleting document:', error);
+    }
+  }
+
+  static async saveFounderWorkspace(userId: string, workspace: FounderWorkspace): Promise<void> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return;
+
+    try {
+      const docRef = doc(this.db, 'users', userId, 'founderWorkspaces', workspace.id);
+      await setDoc(docRef, {
+        ...this.sanitizeForFirestore(workspace),
+        syncedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error saving founder workspace:', error);
+    }
+  }
+
+  static async getFounderWorkspaces(userId: string): Promise<FounderWorkspace[]> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return [];
+
+    try {
+      const workspaceCollection = collection(this.db, 'users', userId, 'founderWorkspaces');
+      const workspaceQuery = query(workspaceCollection, orderBy('updatedAt', 'desc'));
+      const snapshot = await getDocs(workspaceQuery);
+
+      return snapshot.docs.map((workspaceDoc) => ({
+        id: workspaceDoc.id,
+        ...(workspaceDoc.data() as Omit<FounderWorkspace, 'id'>),
+      }));
+    } catch (error) {
+      console.error('Error getting founder workspaces:', error);
+      return [];
+    }
+  }
+
+  static async deleteFounderWorkspace(userId: string, workspaceId: string): Promise<void> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return;
+
+    try {
+      const workspaceRef = doc(this.db, 'users', userId, 'founderWorkspaces', workspaceId);
+      await deleteDoc(workspaceRef);
+    } catch (error) {
+      console.error('Error deleting founder workspace:', error);
     }
   }
 }
