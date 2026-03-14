@@ -359,12 +359,17 @@ function ArtifactCard({
 }
 
 export function FounderWarRoom() {
+  const [initialWorkspace] = useState<FounderWorkspace>(() => createEmptyFounderWorkspace());
   const [userId, setUserId] = useState<string | null>(null);
   const [storageMode, setStorageMode] = useState<"local" | "cloud">("local");
-  const [workspaces, setWorkspaces] = useState<FounderWorkspace[]>([]);
-  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
-  const [briefDraft, setBriefDraft] = useState<FounderBrief>(() => createEmptyFounderWorkspace().brief);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [workspaces, setWorkspaces] = useState<FounderWorkspace[]>([initialWorkspace]);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(initialWorkspace.id);
+  const [briefDraft, setBriefDraft] = useState<FounderBrief>(() =>
+    createDraftFromWorkspace(initialWorkspace),
+  );
+  const [searchQuery, setSearchQuery] = useState(() =>
+    FounderWarRoomService.createSearchQuery(initialWorkspace),
+  );
   const [urlInput, setUrlInput] = useState("");
   const [copilotPrompt, setCopilotPrompt] = useState("");
   const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -1079,7 +1084,12 @@ export function FounderWarRoom() {
       if (cancelled) return;
 
       if (loaded.length === 0) {
-        createFallbackWorkspace(uid, "bootstrap");
+        applyWorkspaceSnapshot([initialWorkspace], initialWorkspace.id);
+        if (uid) {
+          void FounderWorkspaceStorage.saveWorkspace(uid, initialWorkspace).catch((error) => {
+            console.warn("Failed to persist initial founder workspace:", error);
+          });
+        }
       } else {
         applyWorkspaceSnapshot(loaded, loaded[0].id);
       }
@@ -1095,7 +1105,7 @@ export function FounderWarRoom() {
       if (!cancelled) {
         setUserId(fallbackUserId);
         setStorageMode("local");
-        createFallbackWorkspace(fallbackUserId, "initialization failure");
+        applyWorkspaceSnapshot([initialWorkspace], initialWorkspace.id);
       }
 
       setIsHydrating(false);
@@ -1108,7 +1118,7 @@ export function FounderWarRoom() {
         URL.revokeObjectURL(audioPreviewObjectUrlRef.current);
       }
     };
-  }, [applyWorkspaceSnapshot, createFallbackWorkspace]);
+  }, [applyWorkspaceSnapshot, createFallbackWorkspace, initialWorkspace]);
 
   useEffect(() => {
     if (isHydrating || activeWorkspace) return;
@@ -1138,7 +1148,7 @@ export function FounderWarRoom() {
     setUrlInput("");
   }, [activeWorkspaceId, workspaces]);
 
-  if (isHydrating || !activeWorkspace || !stageProgress) {
+  if (!activeWorkspace || !stageProgress) {
     return (
       <ThemeWrapper>
         <div className="min-h-screen app-shell-gradient text-foreground">
@@ -1150,7 +1160,7 @@ export function FounderWarRoom() {
                   Founder War Room
                 </CardTitle>
                 <CardDescription>
-                  Loading your founder workspace, evidence board, and startup pack artifacts.
+                  Recovering your founder workspace, evidence board, and startup pack artifacts.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -1172,6 +1182,7 @@ export function FounderWarRoom() {
                   <Badge className="bg-primary/90 text-primary-foreground">Founder War Room</Badge>
                   <Badge variant="outline">Pitch Copilot</Badge>
                   <Badge variant="outline">{storageMode === "cloud" ? "Firebase sync on" : "Local-first mode"}</Badge>
+                  {isHydrating ? <Badge variant="secondary">Syncing workspace</Badge> : null}
                 </div>
 
                 <div className="space-y-3">
