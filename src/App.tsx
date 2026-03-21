@@ -1,5 +1,5 @@
-import FounderWarRoom from "@/components/FounderWarRoom";
+import LocalGrowthOS from "@/components/LocalGrowthOS";
 
 export default function App() {
-  return <FounderWarRoom />;
+  return <LocalGrowthOS />;
 }

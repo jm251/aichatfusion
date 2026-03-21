@@ -25,6 +25,7 @@ import {
 } from 'firebase/firestore';
 import { Message, FirebaseChat } from './types';
 import { FounderWorkspace } from './founder-types';
+import { OrganizationWorkspace } from './local-growth-types';
 
 export class FirebaseService {
   private static app: FirebaseApp | null = null;
@@ -449,6 +450,52 @@ export class FirebaseService {
       await deleteDoc(workspaceRef);
     } catch (error) {
       console.error('Error deleting founder workspace:', error);
+    }
+  }
+
+  static async saveLocalGrowthWorkspace(userId: string, workspace: OrganizationWorkspace): Promise<void> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return;
+
+    try {
+      const docRef = doc(this.db, 'users', userId, 'localGrowthWorkspaces', workspace.id);
+      await setDoc(docRef, {
+        ...this.sanitizeForFirestore(workspace),
+        syncedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error saving local growth workspace:', error);
+    }
+  }
+
+  static async getLocalGrowthWorkspaces(userId: string): Promise<OrganizationWorkspace[]> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return [];
+
+    try {
+      const workspaceCollection = collection(this.db, 'users', userId, 'localGrowthWorkspaces');
+      const workspaceQuery = query(workspaceCollection, orderBy('updatedAt', 'desc'));
+      const snapshot = await getDocs(workspaceQuery);
+
+      return snapshot.docs.map((workspaceDoc) => ({
+        id: workspaceDoc.id,
+        ...(workspaceDoc.data() as Omit<OrganizationWorkspace, 'id'>),
+      }));
+    } catch (error) {
+      console.error('Error getting local growth workspaces:', error);
+      return [];
+    }
+  }
+
+  static async deleteLocalGrowthWorkspace(userId: string, workspaceId: string): Promise<void> {
+    if (!this.db) await this.initialize();
+    if (!this.db) return;
+
+    try {
+      const workspaceRef = doc(this.db, 'users', userId, 'localGrowthWorkspaces', workspaceId);
+      await deleteDoc(workspaceRef);
+    } catch (error) {
+      console.error('Error deleting local growth workspace:', error);
     }
   }
 }
